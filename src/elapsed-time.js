@@ -27,24 +27,20 @@ class ElapsedTime extends React.Component {
         }
     }
     render (){
-        if (this.props.playing){
-            var elapsed = (this.state.now - this.props.startTime) / 1000;
-            
+        if (this.props.buffer === null){
             return (
-                <div>{this.formatTime(elapsed)}/{this.formatTime(this.props.activeBuffer.buffer.duration)}</div>
+                <div> 00:00/00:00 </div>
             );
         }
 
-        if (this.props.pausedTime !== null){
-            var elapsed = this.props.pausedTime / 1000;
-            return (
-                <div>{this.formatTime(elapsed)}/{this.formatTime(this.props.activeBuffer.buffer.duration)}</div>
-            );
-        }
-
+        var elapsed = this.props.buffer.getTime();
+        var total = this.props.buffer.getDuration();
+        
         return (
-            <div> 00:00/00:00 </div>
+            <div>{this.formatTime(elapsed)}/{this.formatTime(total)}</div>
         );
+
+        
     }
 }
 

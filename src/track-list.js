@@ -13,10 +13,8 @@ class Track extends React.Component {
                 {function(){
                     if (this.props.buffer === this.props.activeBuffer){
                         return <PlayPause buffer={this.props.buffer}
-                           activeBuffer={this.props.activeBuffer} 
                            unpause={this.props.unpause}
                            pause={this.props.pause}
-                           play={this.props.play}
                            playing={this.props.playing}/>;
                     } else {
                         return <span style={{display:"inline-block", height:1, width:25}}/>;
@@ -44,20 +42,10 @@ class TrackList extends React.Component {
                 this.setState({selectedTrack: (this.state.selectedTrack - 1 + this.props.tracks.length) % this.props.tracks.length});
             }
             if (e.key === "h" || e.key === "ArrowLeft"){
-                if (this.props.playing){
-                    this.props.seek(Math.max((new Date() - this.props.startTime) / 1000 - 5),0);
-                } else if (this.props.pausedTime !== null){
-                    this.props.seek(Math.max(this.props.pausedTime / 1000 - 5),0);
-                }
-                
+                this.props.seek(Math.max(this.props.activeBuffer.getTime() - 5,0));
             }
             if (e.key === "l" || e.key === "ArrowRight"){
-                if (this.props.playing){
-                    this.props.seek(Math.min((new Date() - this.props.startTime) / 1000 + 5),this.props.activeBuffer.buffer.duration);
-                } else if (this.props.pausedTime !== null){
-                    this.props.seek(Math.min(this.props.pausedTime / 1000 + 5),this.props.activeBuffer.buffer.duration);
-                }
-                
+                this.props.seek(Math.min(this.props.activeBuffer.getTime() + 5,this.props.activeBuffer.getDuration()));
             }
             if (e.key === "Enter"){
                 this.props.play(this.props.buffers[this.props.tracks[this.state.selectedTrack]], 0);

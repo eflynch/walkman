@@ -2,7 +2,7 @@ import React from 'react';
 
 import Controls from './controls';
 import TrackList from './track-list';
-import {loadBuffer, loadBufferList, BufferWrapper} from './lib';
+import {loadBufferList, BufferWrapper} from './lib';
 
 class Walkman extends React.Component {
     constructor(props){
@@ -10,13 +10,9 @@ class Walkman extends React.Component {
         this.state = {
             buffers: {},
             playing: false,
-            activeBuffer: null,
-            startTime: null,
-            pausedTime: null
+            activeBuffer: null
         };
-        this.ctx = new AudioContext();
 
-        this.onBufferLoad = this.onBufferLoad.bind(this);
         this.pause = this.pause.bind(this);
         this.unpause = this.unpause.bind(this);
         this.play = this.play.bind(this);
@@ -32,42 +28,33 @@ class Walkman extends React.Component {
     componentWillReceiveProps(nextProps){
         for (var i=0; i < nextProps.tracks.length; i++){
             if (this.state.buffers[nextProps.tracks[i]] === undefined){
-                loadBuffer(this.ctx,
-                           this.props.prefix + nextProps.tracks[i], 
-                           nextProps.tracks[i],
-                           this.onBufferLoad,
-                           function(bufferURL){console.log("failed to load " + bufferURL);
-                });
+                var newBuffer = new BufferWrapper(
+                   this.props.prefix + nextProps.tracks[i], 
+                   nextProps.tracks[i],
+                   this.onEndedHandler);
+                this.state.buffers[newBuffer.name] = newBuffer;
+                this.setState({buffers: this.state.buffers});
             }
         }
     }
 
-    onBufferLoad(buffer){
-        this.state.buffers[buffer.name] = buffer;
-        this.setState({buffers: this.state.buffers});
-    }
-
     pause(){
-        if (!this.state.playing){
+        if (this.state.activeBuffer === null || this.state.activeBuffer.getPaused()){
             return;
         }
-        this.state.activeBuffer.stop(this.ctx);
-        this.setState({
-            playing: false,
-            pausedTime: new Date() - this.state.startTime
-        });
+        this.state.activeBuffer.pause();
+        this.setState({playing: false});
     }
 
     unpause(){
-        if (this.state.playing){
+        if (this.state.activeBuffer === null){
             return;
         }
-        this.state.activeBuffer.start(this.ctx, this.state.pausedTime / 1000, this.onEndedHandler);
-        this.setState({
-            playing: true,
-            pausedTime: null,
-            startTime: new Date() - this.state.pausedTime
-        })
+        if (!this.state.activeBuffer.getPaused()){
+            return;
+        }
+        this.state.activeBuffer.play();
+        this.setState({playing: true});
     }
 
     onEndedHandler(e){
@@ -85,14 +72,14 @@ class Walkman extends React.Component {
         if (buffer === undefined){
             return;
         }
-        if (this.state.playing){
+        if (this.state.activeBuffer !== null){
             this.stop();
         }
-        buffer.start(this.ctx, 0, this.onEndedHandler);
+        buffer.seek(0);
+        buffer.play();
         this.setState({
             activeBuffer: buffer,
-            playing: true,
-            startTime: new Date()
+            playing: true
         });
     }
 
@@ -100,12 +87,10 @@ class Walkman extends React.Component {
         if (this.state.activeBuffer === null){
             return;
         }
-        this.state.activeBuffer.stop(this.ctx);
+        this.state.activeBuffer.pause();
         this.setState({
             activeBuffer: null,
-            playing: false,
-            startTime: null,
-            pausedTime: null
+            playing: false
         });
     }
 
@@ -113,16 +98,7 @@ class Walkman extends React.Component {
         if (this.state.activeBuffer === null){
             return;
         }
-        if (this.state.playing){
-            this.state.activeBuffer.stop(this.ctx);
-            this.state.activeBuffer.start(this.ctx, time, this.onEndedHandler);
-            this.setState({
-                pausedtime: null,
-                startTime: new Date() - (time * 1000)
-            });
-        } else {
-            this.setState({pausedTime: time * 1000});
-        }
+        this.state.activeBuffer.seek(time);
     }
 
     render(){
@@ -130,9 +106,6 @@ class Walkman extends React.Component {
             <div className="WALKMAN">
                 <Controls activeBuffer={this.state.activeBuffer}
                           playing={this.state.playing}
-                          now={this.props.now}
-                          startTime={this.state.startTime}
-                          pausedTime={this.state.pausedTime}
                           play={this.play}
                           pause={this.pause}
                           stop={this.stop}
@@ -141,8 +114,6 @@ class Walkman extends React.Component {
                 <div style={{height:20, width:20}}/>
                 <TrackList tracks={this.props.tracks}
                            activeBuffer={this.state.activeBuffer}
-                           startTime={this.state.startTime}
-                           pausedTime={this.state.pausedTime}
                            buffers={this.state.buffers}
                            playing={this.state.playing}
                            play={this.play}
@@ -155,5 +126,5 @@ class Walkman extends React.Component {
     }
 }
 
-export {Walkman, loadBuffer, loadBufferList, BufferWrapper};
+export {Walkman, loadBufferList, BufferWrapper};
 export default Walkman;

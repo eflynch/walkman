@@ -18,30 +18,13 @@ class TimeLine extends React.Component {
         }
     }
     onClick(e){
-        if (this.props.activeBuffer === null){
-            return;
-        }
-        var time = e.clientX / e.currentTarget.offsetWidth * this.props.activeBuffer.buffer.duration;
+        var time = e.clientX / e.currentTarget.offsetWidth * this.props.buffer.getDuration();
         this.props.seek(time);
     }
     render (){
-        if (this.props.playing){
-            var elapsed = ((this.state.now - this.props.startTime) / 1000);
-            var width = 100 * elapsed / this.props.activeBuffer.buffer.duration;
-            return (
-                <div onClick={this.onClick.bind(this)} style={{display:"inline-block", width: "100%", height: 10}}>
-                    <div>
-                        <div style={{width: width +"%", height: 4, borderBottom: "solid 1px white", display:"inline-block"}}/>
-                        <div style={{width: (100-width) + "%", height: 4, borderBottom: "solid 1px gray", display:"inline-block"}}/>
-                    </div>
-                    <div/>
-                </div>
-            );
-        }
-
-        if (this.props.pausedTime !== null){
-            var elapsed = this.props.pausedTime / 1000;
-            var width = 100 * elapsed / this.props.activeBuffer.buffer.duration;
+        if (this.props.buffer !== null){
+            var elapsed = this.props.buffer.getTime();
+            var width = 100 * this.props.buffer.getTime() / this.props.buffer.getDuration();
             return (
                 <div onClick={this.onClick.bind(this)} style={{display:"inline-block", width: "100%", height: 10}}>
                     <div>

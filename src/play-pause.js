@@ -7,17 +7,11 @@ class PlayPause extends React.Component {
             return <span className="disabled"><FontAwesome fixedWidth name="play"/></span>;
         }
 
-        if (this.props.activeBuffer === this.props.buffer){
-            if (this.props.playing){
-                return <span onClick={this.props.pause}><FontAwesome fixedWidth name="pause"/></span>;
-            }
-
+        if (!this.props.playing){
             return <span onClick={this.props.unpause}><FontAwesome fixedWidth name="play"/></span>;
         }
 
-        return <span onClick={function(){
-            this.props.play(this.props.buffer, 0);
-        }.bind(this)}><FontAwesome fixedWidth name="play"/></span> 
+        return <span onClick={this.props.pause}><FontAwesome fixedWidth name="pause"/></span>;
     }
 }
 

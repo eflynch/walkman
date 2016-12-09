@@ -11,28 +11,22 @@ class Controls extends React.Component {
         return (
             <div>
                 <PlayPause playing={this.props.playing}
-                           activeBuffer={this.props.activeBuffer}
                            buffer={this.props.activeBuffer}
                            pause={this.props.pause}
-                           play={this.props.play}
                            unpause={this.props.unpause}/>
-                <Stop playing={this.props.playing} stop={this.props.stop} pausedTime={this.props.pausedTime}/>
+                <Stop active={this.props.activeBuffer !== null} stop={this.props.stop}/>
                 {" "}
-                <TrackName activeBuffer={this.props.activeBuffer}/>
+                <TrackName buffer={this.props.activeBuffer}/>
                 <div>
-                    <div style={{display:"inline-block", width:400}}>
-                        <TimeLine playing={this.props.playing}
-                                  activeBuffer={this.props.activeBuffer}
-                                  startTime={this.props.startTime}
-                                  pausedTime={this.props.pausedTime}
-                                  seek={this.props.seek}/>
+                    <div className="elapsed-time">
+                        <ElapsedTime playing={this.props.activeBuffer !== null && !this.props.activeBuffer.getPaused()}
+                                     buffer={this.props.activeBuffer}/>
                     </div>
                     {" "}
-                    <div style={{display:"inline-block", width:200}}>
-                        <ElapsedTime playing={this.props.playing}
-                                     activeBuffer={this.props.activeBuffer}
-                                     startTime={this.props.startTime}
-                                     pausedTime={this.props.pausedTime}/>
+                    <div style={{width:"80%"}}>
+                        <TimeLine playing={this.props.activeBuffer !== null && !this.props.activeBuffer.getPaused()}
+                                  buffer={this.props.activeBuffer}
+                                  seek={this.props.seek}/>
                     </div>
                 </div>
             </div>

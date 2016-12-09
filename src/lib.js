@@ -1,57 +1,41 @@
 class BufferWrapper {
-    constructor(name, buffer, gain){
+    constructor(url, name, onended){
+        this.url = url;
         this.name = name;
-        this.buffer = buffer;
-        this.gain = gain;
-        this.srcNode = false;
-        this.gainNode = false;
+        this.audio = new Audio();
+        this.audio.src = url;
+        this.audio.controls = false;
+        this.audio.onended = onended;
+        document.body.appendChild(this.audio);
     }
 
-    start(ctx, time, callback){
-        var srcNode = ctx.createBufferSource();
-        var gainNode = ctx.createGain();
-        srcNode.buffer = this.buffer;
-        srcNode.loop = false;
-        srcNode.onended = callback || function(){};
-        srcNode.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        gainNode.gain.value = this.gain;
-        srcNode.start(ctx.currentTime,time);
-        this.srcNode = srcNode;
-        this.gainNode = gainNode;
+    getDuration(){
+        return this.audio.duration;
     }
 
-    stop(ctx){
-        if (this.srcNode){
-            this.srcNode.onended = null;
-            this.srcNode.stop();
-            this.srcNode = false;
-            this.gainNode = false;
-        }
+    getTime(){
+        return this.audio.currentTime;
+    }
+
+    getPaused(){
+        return this.audio.paused;
+    }
+
+    play(){
+        this.audio.play();
+    }
+
+    pause(){
+        this.audio.pause();
+    }
+
+    seek(time){
+        this.audio.currentTime = time;
     }
 
     setGain(gain){
-        this.gain = gain;
-        if (this.gainNode){
-            this.gainNode.gain.value = gain;
-        }
+        this.audio.volume = gain;
     }
-}
-
-var loadBuffer = function (ctx, bufferURL, name, onSuccess, onFail) {
-    var req = new XMLHttpRequest();
-    req.open("GET", bufferURL, true);
-    req.responseType = "arraybuffer";
-    req.onload = function (e) {
-        if (this.status == 200){
-            ctx.decodeAudioData(req.response, (buffer) => {
-                onSuccess(new BufferWrapper(name, buffer, 1.0));
-            });
-        } else {
-            onFail(name);
-        }
-    }
-    req.send();
 }
 
 var loadBufferList = function (directory, successHandler, errorHandler){
@@ -79,7 +63,6 @@ var loadBufferList = function (directory, successHandler, errorHandler){
 
 
 module.exports ={
-    loadBuffer: loadBuffer,
     loadBufferList: loadBufferList,
     BufferWrapper: BufferWrapper
 }
