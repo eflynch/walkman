@@ -47,9 +47,15 @@ class TrackList extends React.Component {
                 this.setState({selectedTrack: (this.state.selectedTrack - 1 + this.props.tracks.length) % this.props.tracks.length});
             }
             if (e.key === "h" || e.key === "ArrowLeft"){
+                if (this.props.activeBuffer === null){
+                    return;
+                }
                 this.props.seek(Math.max(this.props.activeBuffer.getTime() - 5,0));
             }
             if (e.key === "l" || e.key === "ArrowRight"){
+                if (this.props.activeBuffer === null){
+                    return;
+                }
                 this.props.seek(Math.min(this.props.activeBuffer.getTime() + 5,this.props.activeBuffer.getDuration()));
             }
             if (e.key === "Enter"){
