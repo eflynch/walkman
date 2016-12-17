@@ -111,7 +111,6 @@ class Walkman extends React.Component {
                           stop={this.stop}
                           seek={this.seek}
                           unpause={this.unpause}/>
-                <div style={{height:20, width:20}}/>
                 <TrackList tracks={this.props.tracks}
                            activeBuffer={this.state.activeBuffer}
                            buffers={this.state.buffers}

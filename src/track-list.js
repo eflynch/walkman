@@ -8,6 +8,13 @@ class Track extends React.Component {
         this.props.select(this.props.number);
     }
     render (){
+        var className = "trackname";
+        if (this.props.selected){
+            className += " selected";
+        }
+        if (this.props.buffer === this.props.activeBuffer){
+            className += " playing";
+        }
         return (
             <li className={this.props.buffer === undefined ? "disabled" : ""}>
                 {function(){
@@ -16,11 +23,9 @@ class Track extends React.Component {
                            unpause={this.props.unpause}
                            pause={this.props.pause}
                            playing={this.props.playing}/>;
-                    } else {
-                        return <span style={{display:"inline-block", height:1, width:25}}/>;
-                    }
+                    } 
                 }.bind(this)()}
-                <span className={this.props.selected ? "selected" : ""}
+                <span className={className}
                       onClick={this.onClickHandler.bind(this)}>{this.props.number + ". " + this.props.name.split(".")[0]}</span>
             </li>
         );

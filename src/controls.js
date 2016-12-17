@@ -9,7 +9,7 @@ import ElapsedTime from './elapsed-time';
 class Controls extends React.Component {   
     render () {
         return (
-            <div>
+            <div className="WALKMAN-controls">
                 <PlayPause playing={this.props.playing}
                            buffer={this.props.activeBuffer}
                            pause={this.props.pause}
@@ -23,7 +23,7 @@ class Controls extends React.Component {
                                      buffer={this.props.activeBuffer}/>
                     </div>
                     {" "}
-                    <div style={{width:"80%"}}>
+                    <div style={{width:"100%"}}>
                         <TimeLine playing={this.props.activeBuffer !== null && !this.props.activeBuffer.getPaused()}
                                   buffer={this.props.activeBuffer}
                                   seek={this.props.seek}/>
